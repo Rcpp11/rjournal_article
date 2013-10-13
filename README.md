@@ -11,11 +11,10 @@ The article will:
    lambda Rcpp user. Once you start to use them it is hard to look back. 
    I might also mention lambda functions. 
  - introduce [Rcpp11](https://github.com/romainfrancois/Rcpp11), 
-   a reboot of Rcpp targerting C++11. 
+   a C++11 centric redesign of Rcpp 
  - mention known compilers that support c++11. clang and gcc are feature complete. 
  - extend the view on the future of C++. A new standard is likely to 
-   be published in 2014 and it
-   is likely that compilers will support it upfront. 
+   be published in 2014 and it is likely that compilers will support it upfront. 
    C++17 will also bring interesting possibilities. 
    
    
