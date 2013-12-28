@@ -2,13 +2,14 @@ language: cpp
 before_install:
   - export CC="gcc-4.8 -std=gnu99"
   - export CXX="g++-4.8 -std=c++11"
+  - curl "https://raw.github.com/andreafabrizi/Dropbox-Uploader/master/dropbox_uploader.sh" -o dropbox_uploader.sh
+  - chmod 755 dropbox_uploader.sh
+  - echo -e "APPKEY=${APPKEY}\nAPPSECRET=${APPSECRET}\nACCESS_LEVEL=sandbox\nOAUTH_ACCESS_TOKEN=${OAUTH_ACCESS_TOKEN}\nOAUTH_ACCESS_TOKEN_SECRET=${OAUTH_ACCESS_TOKEN_SECRET}" > ~/.dropbox_uploader
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
   - sudo apt-get install -qq g++-4.8
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/dropbox.sh
   - chmod 755 ./travis-tool.sh
-  - chmod 755 ./dropbox.sh
   - ./travis-tool.sh bootstrap
   - mkdir ~/.R
   - echo -e "CC=gcc-4.8 -std=gnu99\nCXX=g++-4.8 -std=c++11\nCXXFLAGS=-g -O3\nCFLAGS=-g -O3\n" > ~/.R/Makevars
@@ -24,7 +25,7 @@ script:
 after_failure:
   - ./travis-tool.sh dump_logs
 after_success:
-  - ./dropbox.sh upload Rcpp11_article.pdf
+  - ./dropbox_uploader.sh upload Rcpp11_article.pdf
 notifications:
   email:
     on_success: change
@@ -33,9 +34,9 @@ env:
   global:    
     - ACCESS_LEVEL=sandbox
     # OAUTH_ACCESS_TOKEN
-    - secure: "L2nMdP3DiFG1jMJb6x8Qi9plB3NZtovhlxe6QqZwzzI+WeZYrQJL5mJyEDJ9tkHIVS9yhmf3v8bauyes7tgd28evrac++jwQxi5TETmFoeqkcOlbmyqKY74EYXNOgSoPWf96OL6i9OhamraqHN5rzSE+8w2Q0jYPXaqGXUdvkoM="
+    - secure: "oapv0v/tR/vyCn94OvMMUAAArSGkjS99bfWMJ5wPoakZWSxB95bxBw91uEd+R5i2tMQ9HJ1+xqpSwzyY7HwtO1LAeHSwQbUywlmImpeWT1mIFQvQnCK6UntRPqEultMlXMPkI15AtRY/Y2O8ymZ+LfaNYKnfiE6ievEq3hLkYkQ="
     # OAUTH_ACCESS_TOKEN_SECRET
-    - secure: "DS3lr2o3FM/E7H63F6GvpAKWgzd0cvbxokQoIybEQpps21zRMFaCkBJiRDsulQ3ItzPHp8KREoUUuRCx1W4rFiLLVV94PaiKPnVBAETUUDjxMi+tkuGiUyfJYYzf0IySPl2au1jrnk7zjq0YWRlJZ75zWLjdI66UoaSfAbYmMrI="
+    - secure: "V16IuBvKpl8kTc+x/Wlj5qpq9BpuBf8Ckr/p5Tp5M1ngeV0vi9mPEwTDreuXQwAxwoEI+QHAKp1ZJRt6dJU1p/S99r1XC31nWeQVZ8eFnRaoQ9kaifmj/x25lOHSSSANXPc3jAjfLVykx6piaSjs3CLWStI5b78Py41+cVexYI0="
     # APPKEY
     - secure: "SX2wfAetBCPQAU03mK0rLDtTmBjS8IBAJxIS3gaeiwpcEBFlPCHRKWGHksG255bQ71wa2b7JD4FvZML6iEDEhBggzqEh4EBUA1Uk3Yc/pS9LCPYQYgIe1SGhPJicx8gXxtqvt652z2CW+3nclUAxaEdVxmdB6CjtF6WG8HQoZP4="
     # APPSECRET
