@@ -30,10 +30,14 @@ notifications:
     on_success: change
     on_failure: change
 env:
-  global:
+  global:    
     - ACCESS_LEVEL=sandbox
-    - secure: "HtEAC92cUGHYxuVg+XkDUylGuRQzEiR65PKd2WBTeeCn3MNz1ttb+6WV7Y3542V8pBuxuPrx9lZsxjRNpX5AUarpAMcwkIhPgQk9e8dVvDhhtkn8isAIdheEiF/vogOd7SU0VLwBRp98AYjxSVKyBOB4a2KCmiY+gDsvxUmz+xs="
-    - secure: "JooAiw2gPAO23etnDT1G3f7p78hBnbfDKhZ3GORK/OIjuKeWhpJxOUP7IlJTvFvStvpRXQve4yjTTl9GqyWL4Fi5fBbeb+heLqBTE+qgroxNTIh+Po6X66mjHfiz1vamyTBoKDCorhMCpQMUkAqRRbt1oAZA9/panScHWVkfbfo="
-    - secure: "btq2KVHgpN4M1iWqFHTuDS5EPNgWfBy615Fc1dX7C1Q7xLdHuskx/KQeaF9mvscYYpEX1ONlFhT74CWe2YwK5EXe6wUWDdfUOwFw4L3pohQydjNjMC9hQjEPGB4gDrmu5hCVYzShO7FHtAIAfYaOWqLgydce8dhPR3wbHZG72hs="
-    - secure: "VT5uQeUpGQ1wvdY+urrhTCW5Pgx/gXb+7qckFb3kyU9ySnUG6q35SPTim0/k8hzx+0wAVoIJEBnykjumDWjkr75l4APF20NjQ/1StTZ+KMp0DeDgwgxP9v2h/dZSN3Y/h+QRm4aYgna/iGHQGYxYcpkUThYSjnPeZxbcVcneKMA="
+    # OAUTH_ACCESS_TOKEN
+    - secure: "L2nMdP3DiFG1jMJb6x8Qi9plB3NZtovhlxe6QqZwzzI+WeZYrQJL5mJyEDJ9tkHIVS9yhmf3v8bauyes7tgd28evrac++jwQxi5TETmFoeqkcOlbmyqKY74EYXNOgSoPWf96OL6i9OhamraqHN5rzSE+8w2Q0jYPXaqGXUdvkoM="
+    # OAUTH_ACCESS_TOKEN_SECRET
+    - secure: "DS3lr2o3FM/E7H63F6GvpAKWgzd0cvbxokQoIybEQpps21zRMFaCkBJiRDsulQ3ItzPHp8KREoUUuRCx1W4rFiLLVV94PaiKPnVBAETUUDjxMi+tkuGiUyfJYYzf0IySPl2au1jrnk7zjq0YWRlJZ75zWLjdI66UoaSfAbYmMrI="
+    # APPKEY
+    - secure: "SX2wfAetBCPQAU03mK0rLDtTmBjS8IBAJxIS3gaeiwpcEBFlPCHRKWGHksG255bQ71wa2b7JD4FvZML6iEDEhBggzqEh4EBUA1Uk3Yc/pS9LCPYQYgIe1SGhPJicx8gXxtqvt652z2CW+3nclUAxaEdVxmdB6CjtF6WG8HQoZP4="
+    # APPSECRET
+    - secure: "OEYuTL9ylGzTKuXsjzSxoieO5IJAf2jQhVbiE7KA2iLzoODB7QeyvDX15TNWgpP20AFjRKQ9x+120kqZylAZzG0pwJqfNmkvPsktHK70N2T7a3PnDH9lLdc7OpnLx9//ym/KSqa6zhR9wYFMePVI0U0PdknPaR/irU7z8VdjRVM="
     
