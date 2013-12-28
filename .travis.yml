@@ -12,7 +12,7 @@ before_install:
   - mkdir ~/.R
   - echo -e "CC=gcc-4.8 -std=gnu99\nCXX=g++-4.8 -std=c++11\nCXXFLAGS=-g -O3\nCFLAGS=-g -O3\n" > ~/.R/Makevars
   - sudo apt-get install -qq ttf-sil-gentium ttf-sil-gentium-basic
-  - sudo apt-get install -qq texinfo texlive-fonts-extra ttf-inconsolata ttf-droid
+  - sudo apt-get install -qq texinfo texlive-fonts-recommended texlive-fonts-extra ttf-inconsolata ttf-droid
   - sudo apt-get install -qq texlive-xetex texlive-latex-recommended texlive-latex-extra
     
 script: 
