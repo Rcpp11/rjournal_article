@@ -1,0 +1,33 @@
+language: cpp
+
+before_install:
+  - export CC="gcc-4.8 -std=gnu99"
+  - export CXX="g++-4.8 -std=c++11"
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq g++-4.8
+  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
+  - chmod 755 ./travis-tool.sh
+  - ./travis-tool.sh bootstrap
+  - mkdir ~/.R
+  - echo -e "CC=gcc-4.8 -std=gnu99\nCXX=g++-4.8 -std=c++11\nCXXFLAGS=-g 03\nCFLAGS=-g -03\n" > ~/.R/Makevars
+  - sudo apt-get install -qq ttf-sil-gentium ttf-sil-gentium-basic
+  - sudo apt-get install -qq texinfo texlive-fonts-extra ttf-inconsolata ttf-droid
+  - sudo apt-get install -qq texlive-xetex texlive-latex-recommended texlive-latex-extra
+    
+script: 
+  - cd article
+  - pdflatex RJwrapper.tex
+  - pdflatex RJwrapper.tex
+  - cd ..
+  
+after_failure:
+  - ./travis-tool.sh dump_logs
+  
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+
+    
+
