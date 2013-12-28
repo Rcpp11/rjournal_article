@@ -1,5 +1,4 @@
 language: cpp
-
 before_install:
   - export CC="gcc-4.8 -std=gnu99"
   - export CXX="g++-4.8 -std=c++11"
@@ -7,27 +6,34 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq g++-4.8
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
+  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/dropbox.sh
   - chmod 755 ./travis-tool.sh
+  - chmod 755 ./dropbox.sh
   - ./travis-tool.sh bootstrap
   - mkdir ~/.R
   - echo -e "CC=gcc-4.8 -std=gnu99\nCXX=g++-4.8 -std=c++11\nCXXFLAGS=-g -O3\nCFLAGS=-g -O3\n" > ~/.R/Makevars
   - sudo apt-get install -qq ttf-sil-gentium ttf-sil-gentium-basic
   - sudo apt-get install -qq texinfo texlive-fonts-recommended texlive-fonts-extra ttf-inconsolata ttf-droid
   - sudo apt-get install -qq texlive-xetex texlive-latex-recommended texlive-latex-extra
-    
-script: 
+script:
   - cd article
   - pdflatex RJwrapper.tex
   - pdflatex RJwrapper.tex
+  - cp RJwrapper.pdf ../Rcpp11_article.pdf
   - cd ..
-  
 after_failure:
   - ./travis-tool.sh dump_logs
-  
+after_success:
+  - ./dropbox.sh upload Rcpp11_article.pdf
 notifications:
   email:
     on_success: change
     on_failure: change
-
+env:
+  global:
+    ACCESS_LEVEL=sandbox
+    secure: "HtEAC92cUGHYxuVg+XkDUylGuRQzEiR65PKd2WBTeeCn3MNz1ttb+6WV7Y3542V8pBuxuPrx9lZsxjRNpX5AUarpAMcwkIhPgQk9e8dVvDhhtkn8isAIdheEiF/vogOd7SU0VLwBRp98AYjxSVKyBOB4a2KCmiY+gDsvxUmz+xs="
+    secure: "JooAiw2gPAO23etnDT1G3f7p78hBnbfDKhZ3GORK/OIjuKeWhpJxOUP7IlJTvFvStvpRXQve4yjTTl9GqyWL4Fi5fBbeb+heLqBTE+qgroxNTIh+Po6X66mjHfiz1vamyTBoKDCorhMCpQMUkAqRRbt1oAZA9/panScHWVkfbfo="
+    secure: "btq2KVHgpN4M1iWqFHTuDS5EPNgWfBy615Fc1dX7C1Q7xLdHuskx/KQeaF9mvscYYpEX1ONlFhT74CWe2YwK5EXe6wUWDdfUOwFw4L3pohQydjNjMC9hQjEPGB4gDrmu5hCVYzShO7FHtAIAfYaOWqLgydce8dhPR3wbHZG72hs="
+    secure: "VT5uQeUpGQ1wvdY+urrhTCW5Pgx/gXb+7qckFb3kyU9ySnUG6q35SPTim0/k8hzx+0wAVoIJEBnykjumDWjkr75l4APF20NjQ/1StTZ+KMp0DeDgwgxP9v2h/dZSN3Y/h+QRm4aYgna/iGHQGYxYcpkUThYSjnPeZxbcVcneKMA="
     
-
