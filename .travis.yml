@@ -31,9 +31,9 @@ notifications:
     on_failure: change
 env:
   global:
-    ACCESS_LEVEL: sandbox
-    secure: "HtEAC92cUGHYxuVg+XkDUylGuRQzEiR65PKd2WBTeeCn3MNz1ttb+6WV7Y3542V8pBuxuPrx9lZsxjRNpX5AUarpAMcwkIhPgQk9e8dVvDhhtkn8isAIdheEiF/vogOd7SU0VLwBRp98AYjxSVKyBOB4a2KCmiY+gDsvxUmz+xs="
-    secure: "JooAiw2gPAO23etnDT1G3f7p78hBnbfDKhZ3GORK/OIjuKeWhpJxOUP7IlJTvFvStvpRXQve4yjTTl9GqyWL4Fi5fBbeb+heLqBTE+qgroxNTIh+Po6X66mjHfiz1vamyTBoKDCorhMCpQMUkAqRRbt1oAZA9/panScHWVkfbfo="
-    secure: "btq2KVHgpN4M1iWqFHTuDS5EPNgWfBy615Fc1dX7C1Q7xLdHuskx/KQeaF9mvscYYpEX1ONlFhT74CWe2YwK5EXe6wUWDdfUOwFw4L3pohQydjNjMC9hQjEPGB4gDrmu5hCVYzShO7FHtAIAfYaOWqLgydce8dhPR3wbHZG72hs="
-    secure: "VT5uQeUpGQ1wvdY+urrhTCW5Pgx/gXb+7qckFb3kyU9ySnUG6q35SPTim0/k8hzx+0wAVoIJEBnykjumDWjkr75l4APF20NjQ/1StTZ+KMp0DeDgwgxP9v2h/dZSN3Y/h+QRm4aYgna/iGHQGYxYcpkUThYSjnPeZxbcVcneKMA="
+    - ACCESS_LEVEL=sandbox
+    - secure: "HtEAC92cUGHYxuVg+XkDUylGuRQzEiR65PKd2WBTeeCn3MNz1ttb+6WV7Y3542V8pBuxuPrx9lZsxjRNpX5AUarpAMcwkIhPgQk9e8dVvDhhtkn8isAIdheEiF/vogOd7SU0VLwBRp98AYjxSVKyBOB4a2KCmiY+gDsvxUmz+xs="
+    - secure: "JooAiw2gPAO23etnDT1G3f7p78hBnbfDKhZ3GORK/OIjuKeWhpJxOUP7IlJTvFvStvpRXQve4yjTTl9GqyWL4Fi5fBbeb+heLqBTE+qgroxNTIh+Po6X66mjHfiz1vamyTBoKDCorhMCpQMUkAqRRbt1oAZA9/panScHWVkfbfo="
+    - secure: "btq2KVHgpN4M1iWqFHTuDS5EPNgWfBy615Fc1dX7C1Q7xLdHuskx/KQeaF9mvscYYpEX1ONlFhT74CWe2YwK5EXe6wUWDdfUOwFw4L3pohQydjNjMC9hQjEPGB4gDrmu5hCVYzShO7FHtAIAfYaOWqLgydce8dhPR3wbHZG72hs="
+    - secure: "VT5uQeUpGQ1wvdY+urrhTCW5Pgx/gXb+7qckFb3kyU9ySnUG6q35SPTim0/k8hzx+0wAVoIJEBnykjumDWjkr75l4APF20NjQ/1StTZ+KMp0DeDgwgxP9v2h/dZSN3Y/h+QRm4aYgna/iGHQGYxYcpkUThYSjnPeZxbcVcneKMA="
     
