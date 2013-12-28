@@ -1,6 +1,10 @@
 C++ 11 article
 =============
 
+[![Build Status](https://travis-ci.org/romainfrancois/cpp11_article.png)](https://travis-ci.org/romainfrancois/cpp11_article)
+
+[Preview](https://www.dropbox.com/s/pisjtkcdx4rzgpy/Rcpp11_article.pdf)
+
 Article for the R journal about C++11 and beyond. 
 
 The article will:
@@ -25,5 +29,5 @@ At the moment, I (romain) am prepared to author the article on my own.
 I will however consider writing the article with additional authors if
 we can agree on the content. 
 
-Please use the [issue tracker](https://github.com/romainfrancois/cpp11_article/issues)
+Please use the [issue tracker](https://github.com/romainfrancois//issues)
 to share ideas on the content of the article. 
