@@ -9,8 +9,17 @@
 \section{Introduction}
 
 Extending R with compiled code is a great way to achieve good performance. 
-Using C++ to rewrite critical parts of the code where the interpreted nature of R 
-does not scale to deliver has become a popular approach. 
+Using C++ to rewrite critical parts has become a popular approach
+in R package development. 
+
+With the release of long awaited C++11\citep{Cpp11}, 
+the C++ standards commitee has changed the meaning of C++, making it 
+a language that is nicer to use and teach. 
+
+This article has two goals, 
+showing a few examples of C++11 language features that might be 
+relevant to R package development, and introducing
+Rcpp11, a complete C++11 redesign of \CRANpkg{Rcpp}. 
 
 
 \bibliography{Francois}
