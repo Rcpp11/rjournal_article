@@ -28,9 +28,18 @@ relevant to R package developpers using C++. For a complete
 reference of C++11, see~\citep{Stroustrup2013}. 
 
 \subsection{auto}
+
+An example with sugar, where the return type is complicated to express
+by hand. Also mention \texttt{decltype}
+
 \subsection{Range based for loops}
+
+They look like R loops. 
+
 \subsection{Lambda functions}
-\subsection{Move semantics}
+
+Feels like using sapply ...
+
 \subsection{Concurrency and threads}
 
 Machines with multiple cores or even multipe 
@@ -43,11 +52,26 @@ or fall back to using platform specific
 implementations of threads, for example POSIX threads. 
 
 In C++11, threads and concurrency programming in general is part of
-the language, and writing parallel computing code has never been easier. 
+the language. 
 
+Writing multi threaded code is hard in general. 
 
+R is not thread safe. which makes it harder. This is not a panacea. 
+
+Real example where it makes a difference. for example using the 
+data from \texttt{cran-logs-dplyr}. 
 
 \section{Rcpp11}
+
+\subsection{Motivation}
+
+Complete redesign of Rcpp
+Header only. Assumes C++11.
+Cleaner (got rid of some ghosts). 
+
+\subsection{Future development}
+
+Threaded sugar. 
 
 \section{Beyond C++11}
 
