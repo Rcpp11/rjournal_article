@@ -19,6 +19,8 @@ before_install:
 script:
   - cd article
   - pdflatex RJwrapper.tex
+  - bibtex RJwrapper
+  - pdflatex RJwrapper.tex
   - pdflatex RJwrapper.tex
   - cp RJwrapper.pdf ../Rcpp11_article.pdf
   - cd ..

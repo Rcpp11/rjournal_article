@@ -3,4 +3,6 @@
 *.bbl
 *.aux
 *.pdf
+*.blg
+*.brf
 

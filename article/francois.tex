@@ -12,8 +12,8 @@ Extending R with compiled code is a great way to achieve good performance.
 Using C++ to rewrite critical parts has become a popular approach
 in R package development. 
 
-With the release of long awaited C++11\citep{Cpp11}, 
-the C++ standards commitee has changed the meaning of C++, making it 
+With the release of long awaited C++11 standard~\citep{Cpp11}, 
+the C++ Standards Commitee has changed the meaning of C++, making it 
 a language that is nicer to use and teach. 
 
 This article has two goals, 
@@ -23,11 +23,29 @@ Rcpp11, a complete C++11 redesign of \CRANpkg{Rcpp}.
 
 \section{Sightseeing Tour of C++11}
 
+This section presents a few features of C++11 which might be 
+relevant to R package developpers using C++. For a complete 
+reference of C++11, see~\citep{Stroustrup2013}. 
+
 \subsection{auto}
 \subsection{Range based for loops}
 \subsection{Lambda functions}
 \subsection{Move semantics}
 \subsection{Concurrency and threads}
+
+Machines with multiple cores or even multipe 
+processors are becoming increasingly available. Best performance 
+is nowadays achieved by writing multithreaded code. 
+
+In C++98 or C++03, this involves using external libraries 
+such as \texttt{Boost.Threads}~\citep{KempfBoostThreads} 
+or fall back to using platform specific 
+implementations of threads, for example POSIX threads. 
+
+In C++11, threads and concurrency programming in general is part of
+the language, and writing parallel computing code has never been easier. 
+
+
 
 \section{Rcpp11}
 
