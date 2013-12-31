@@ -21,7 +21,7 @@ showing a few examples of C++11 language features that might be
 relevant to R package development, and introducing
 Rcpp11, a complete C++11 redesign of \CRANpkg{Rcpp}. 
 
-\section{Sightseeing Tour of C++11}
+\section{Sightseeing tour of C++11}
 
 This section presents a few features of C++11 which might be 
 relevant to R package developpers using C++. For a complete 
@@ -46,20 +46,128 @@ Machines with multiple cores or even multipe
 processors are becoming increasingly available. Best performance 
 is nowadays achieved by writing multithreaded code. 
 
-In C++98 or C++03, this involves using external libraries 
+In previous versions of C++, this involves using external libraries 
 such as \texttt{Boost.Threads}~\citep{KempfBoostThreads} 
 or fall back to using platform specific 
 implementations of threads, for example POSIX threads. 
 
-In C++11, threads and concurrency programming in general is part of
-the language. 
+\subsubsection{Example}
 
-Writing multi threaded code is hard in general. 
+As a simple example, let's consider the problem of counting the number
+of positive values from a numeric vector. In R, we would probably express this
+with this function: 
 
-R is not thread safe. which makes it harder. This is not a panacea. 
+\begin{example}
+count_positive_R <- function(x){
+  sum(x > 0)
+}
+\end{example}
 
-Real example where it makes a difference. for example using the 
-data from \texttt{cran-logs-dplyr}. 
+In C++, we might express the algorithm using the \code{count\_if} template
+function from the STL, combined with a lambda function:
+
+\begin{example}
+typedef NumericVector::iterator Iterator ;
+
+struct count_positive {
+  int operator()(Iterator first, Iterator last){
+    return std::count_if( first, last, 
+      [](double x){ return x > 0 ; } 
+    );    
+  }
+} ;
+
+// [[Rcpp::export]]
+int count_positive_serial(NumericVector data){
+  return count_positive()(data.begin(), data.end());
+}
+\end{example}
+
+The advantage of delegating the work to the range-based callable 
+\code{count\_positive} struct is that we can easily 
+parallelize the code. We simply split the range into a set of ranges, 
+each of which to be processed in a thread. 
+
+\begin{example}
+#include <thread>
+#include <future>
+
+typedef NumericVector::iterator Iterator ;
+typedef std::packaged_task<int(Iterator,Iterator)> Task ;
+
+// [[Rcpp::export]]
+int count_positive_threaded(NumericVector data, int nthreads){
+  int n = data.size() ;
+  int chunk_size = n / nthreads ; 
+  
+  std::vector<std::future<int>> futures(nthreads-1) ;
+  std::vector<std::thread> threads(nthreads-1) ;
+  
+  Iterator it = data.begin() ;
+  for( int i=0; i<nthreads-1; i++){
+    count_positive counter ;        
+    Task task(counter) ;
+    futures[i] = task.get_future();
+    threads[i] = std::thread( std::move(task), it, it + chunk_size ) ;
+    it += chunk_size ;
+  }
+  
+  int result = count_positive()(it, data.end()); 
+  
+  for( int i=0; i<nthreads-1; i++){
+    threads[i].join() ;
+  }
+  for( int i=0; i<nthreads-1; i++){
+    result += futures[i].get() ;  
+  }
+                            
+  return result ;
+}
+\end{example}
+
+For example, with \code{nthreads=4} the three first quarters of the data
+are processed in their own thread and the last quarter is processed by the 
+main thread. Then the main thread joins the 3 worker threads and collect
+the results. This example used \code{thread}, \code{future} and
+\code{packaged\_task} from the C++ Standard Library. 
+
+\begin{table}
+\centering
+\begin{tabular}{lrrrrr}
+\toprule 
+$n$ & $10^5$ & $10^6$ & $10^7$ & $10^8$ & $10^9$ \\ 
+\midrule          
+R         & 0.43 & 3.32  & 34.42 & 467.03 & 4\,977.05 \\
+serial    & 0.09 & 0.91  &  9.25 &  97.59 &    854.21 \\
+\hspace{1.5cm} & 
+\hspace{1.5cm} & 
+\hspace{1.5cm} &
+\hspace{1.5cm} & 
+\hspace{1.5cm} & 
+\hspace{1.5cm} \\
+2 threads & 0.12 & 0.54  &  4.91 &  49.37 &    496.15 \\
+4 threads & 0.15 & 0.35  &  2.76 &  37.47 &    376.31 \\
+8 threads & 0.18 & 0.36  &  2.57 &  37.70 &    371.98 \\
+\bottomrule
+\end{tabular}
+\caption{\label{table:count}Run times (ms). Median run times between 10 runs.\\ 
+{\footnotesize Timings performed on a Mac Book Pro with a 2.3 GHz Intel Core i7 processor (4 cores), 16Go of RAM. 
+Compiled with clang++ version 3.3 with the flags : \code{-g -O3}. R version 3.0.2 
+as distributed by the CRAN binary for OSX. }}
+\end{table}
+
+Table~\ref{table:count} presents some benchmarks with various 
+data sizes (from $10^5$ to $ 10^9$). 
+
+What to say: 
+
+threads have their cost, with too small data sizes, it is actually more
+expensive to use threads. 
+
+R code vectorized but slow, has to allocate memory for the intermediate 
+logical vector. 
+
+We could split the work differently between threads. 
 
 \section{Rcpp11}
 
