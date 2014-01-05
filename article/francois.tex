@@ -25,20 +25,122 @@ Rcpp11, a complete C++11 redesign of \CRANpkg{Rcpp}.
 
 This section presents a few features of C++11 which might be 
 relevant to R package developpers using C++. For a complete 
-reference of C++11, see~\citep{Stroustrup2013}. 
+reference of C++11, see~\citep{Stroustrup2013}.
+
+\subsection{leitmotiv}
+
+We will use a simple leitmotiv to show various features of C++11: counting 
+the number of positive values from a numeric vector. We can easily express
+this as a simple R function:
+
+\begin{example}
+count_positive <- function(x){
+  sum(x > 0)
+}
+\end{example}
+
+Vectorisation has however its cost, as the \code{count\_positive} has to 
+first allocate a logical vector as the same size as \code{x}, and then 
+sum this temporary vector to get the result. 
+
+We could rewrite this example in C++ using any implementation of the 
+\CRANpkg{Rcpp} api with a simple \code{for} loop: 
+
+\begin{example}
+// [[Rcpp::export]]
+int count_positive(NumericVector x){
+  int res = 0 ;
+  for( int i=0; i<x.size(); i++){
+    if( x[i] > 0.0 ) res++ ;
+  }
+  return res ;
+}
+\end{example}
+
+\subsection{Range based for loops}
+
+The previous code chunk uses a typical C++ \code{for} loop, directly 
+inherited from C. C++11 introduces range based for loops, which have 
+closer semantics to the loop we would use in R. We can revisit the 
+example using a range based for loop:
+
+\begin{example}
+// [[Rcpp::export]]
+int count_positive(NumericVector x){
+  int res = 0 ;
+  for( double d: x){
+    if( d > 0 ) res++ ;
+  }
+  return res ;
+}
+\end{example}
+
+This is possible because the \code{NumericVector} class implements 
+the range concept with \code{begin} and \code{end} member functions. 
+
+\subsection{Lambda functions}
+
+Given \code{NumericVector} implements the range concept, a more C++ idiomatic
+way of approaching the problem is to use an algorithm from the Standard
+Template Library. The \code{count\_if} that was introduced
+in C++11 algorithm is a natural fit, \code{count\_if} iterates through a vector
+and counts the number of times the specified predicate is true. 
+
+Before C++11, we would express the predicate using a named function that is defined
+elsewhere: 
+
+\begin{example}
+inline bool is_positive(double x){
+  return x > 0.0 ;
+}
+
+// [[Rcpp::export]]
+int count_positive(NumericVector x){
+  return std::count_if( begin(x), end(x), is_positive ) ;
+}
+\end{example}
+
+We can also use a compatible callable object to capture some context. The 
+following chunk uses the \code{is\_greater} class to capture both the 
+intended comparison with a carefully selected name and the threshold (0.0) ;
+
+\begin{example}
+class is_greater {
+public:
+  is_greater( double threshold_) : threshold(threshold_){}
+  
+  inline bool operator()(double x){
+    return x > threshold ;
+  }
+  
+private:
+  double threshold ;
+}
+// [[Rcpp::export]]
+int count_positive(NumericVector x){
+  return std::count_if( x.begin(), x.end(), is_greater(0.0) ) ;
+}
+\end{example}
+
+With lambdas, C++11 offers a much nicer way to define the predicate, right at the 
+call place. Lambdas make the STL much more useful as it eliminates 
+many boiler plate code that was previously needed:
+
+\begin{example}
+// [[Rcpp::export]]
+int count_positive(NumericVector x){
+  return std::count_if( x.begin(), x.end(), 
+    [](double d){ return d > 0 ;}
+  ) ;
+}
+\end{example}
+
 
 \subsection{auto}
 
 An example with sugar, where the return type is complicated to express
 by hand. Also mention \texttt{decltype}
 
-\subsection{Range based for loops}
-
-They look like R loops. 
-
-\subsection{Lambda functions}
-
-Feels like using sapply ...
 
 \subsection{Concurrency and threads}
 
