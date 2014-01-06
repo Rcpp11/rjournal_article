@@ -4,7 +4,24 @@
 
 \maketitle
 
-\abstract{}
+\abstract{
+  The success of \CRANpkg{Rcpp}~\citep{CRAN:Rcpp} for extending R
+  with packages shipping C++ code is indisputable. \CRANpkg{Rcpp} has 
+  shaped the landscape of performance code for statistical software 
+  distributed by means of R packages. 
+  
+  The C++ Standards commitee has finally delivered the C++11 
+  standard~\citep{Cpp11} and in 2013 several vendors have 
+  delivered full featured versions of their compiler suite. C++11 redefines
+  what it means to write C++ code, it is simpler to use, more efficient, 
+  more concise and more comprehensive than previous versions of the 
+  standard. 
+  
+  This article is an example based walkthrough of some of the features 
+  of C++11 that might be relevant to R users and developpers of 
+  R packages that use C++ code. This also introduces the 
+  \CRANpkg{Rcpp11} package, a complete C++11-centric rewrite of \CRANpkg{Rcpp}. 
+}
 
 \section{Introduction}
 
@@ -14,16 +31,13 @@ in R package development.
 
 With the release of long awaited C++11 standard~\citep{Cpp11}, 
 the C++ Standards Commitee has changed the meaning of C++, making it 
-a language that is nicer to use and teach. 
+a language that is nicer to use and teach. For a complete 
+reference of C++11, see~\citep{Stroustrup2013}
 
 This article has two goals, 
 showing a few examples of C++11 language features that might be 
 relevant to R package development, and introducing
 Rcpp11, a complete C++11 redesign of \CRANpkg{Rcpp}. 
-
-This section presents a few features of C++11 which might be 
-relevant to R package developpers using C++. For a complete 
-reference of C++11, see~\citep{Stroustrup2013}.
 
 \section{leitmotiv}
 
@@ -339,6 +353,7 @@ unordered maps and sets. were available in TR1, which used to be a pain. is it t
 
 \section{Rcpp11}
 
+TODO: 
 Complete redesign of Rcpp. 
 Header only. Assumes C++11.
 Much smaller (elimininated lots of code bloat). 
