@@ -113,7 +113,18 @@ int count_positive(NumericVector x){
 \end{example}
 
 This is possible because the \code{NumericVector} class implements 
-the range concept with \code{begin} and \code{end} member functions. 
+the range concept with \code{begin} and \code{end} member functions. This 
+\code{for} loop is simpler to read than the general C++ \code{for} loop. It is also
+more efficient than a badly written general for loop. It is fairly 
+common to see the loop expressed as \code{for(int i=0; i<x.size(); i++)} which 
+will perform badly as it has to evaluate \code{x.size()} at each iteration. 
+Depending on the compiler's optimisation aggressiveness, this might have a 
+dramatic impact on performance. The simpler \code{for} loop does not 
+have this problem as it simply processes each element in the range between 
+\code{begin()} and \code{end()}. It also has the advantage of 
+resembling the R loop, although using the semicolon instead of the \code{in} keyword
+and requiring us to specify the type of the looping variable \code{d} as C++
+is a strongly typed language.  
 
 \section{Lambda functions}
 
