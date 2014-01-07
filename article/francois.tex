@@ -62,9 +62,10 @@ update Rcpp} will be discussed in the relevant section.
 
 \section{leitmotiv}
 
-We will use a simple leitmotiv to show various features of C++11: counting 
-the number of positive values from a numeric vector. We can easily express
-this as a simple R function:
+Consider the simple problem of counting the number of positive values
+from a numeric vector. We will use this problem as a leitmotiv for the 
+article, gradually introducting C++11 features.  
+We can easily express this as a straightforward R function:
 
 \begin{example}
 count_positive <- function(x){
@@ -72,26 +73,33 @@ count_positive <- function(x){
 }
 \end{example}
 
-We could rewrite this example in C++ using any implementation of the 
-\CRANpkg{Rcpp} api with a simple \code{for} loop: 
+Taking advantage of R vectorisation of the \code{>} binary operator, this 
+function is as good as it gets. We will see later that this vectorisation 
+comes at a steep price in terms of memory and time, both impacting the 
+performance, but for now let's concentrate on the basics and 
+rewrite the function using a simple for loop over elements of a 
+\code{NumericVector}. 
 
 \begin{example}
 // [[Rcpp::export]]
 int count_positive(NumericVector x){
-  int res = 0 ;
-  for( int i=0; i<x.size(); i++){
-    if( x[i] > 0.0 ) res++ ;
-  }
+  int n = x.size(), res = 0 ;
+  for( int i=0; i<n; i++) if( x[i] > 0.0 ) res++ ;
   return res ;
 }
 \end{example}
+
+While the R version had to allocate memory for a temporary logical 
+vector, traverse the input data to fill this temporary object, then 
+traverse this temporary logical vector to sum the values equal to \code{TRUE}, 
+the C++ version is essentially a simple for loop. 
 
 \section{Range based for loops}
 
 The previous code chunk uses a typical C++ \code{for} loop, directly 
 inherited from C. C++11 introduces range based for loops, which have 
-closer semantics to the loop we would use in R. We can revisit the 
-example using a range based for loop:
+closer semantics to the loop we would use in R, usually known as
+for/each loops. We can revisit the example using a range based for loop:
 
 \begin{example}
 // [[Rcpp::export]]
