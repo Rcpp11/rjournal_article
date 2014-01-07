@@ -9,10 +9,10 @@
   with packages shipping C++ code is indisputable. \CRANpkg{Rcpp} has 
   shaped the landscape of performance code for statistical software 
   distributed by means of R packages. In 2011, the C++ Standards 
-  commitee has finally delivered the C++11 
+  commitee has finally released the C++11 
   standard~\citep{Cpp11} and in 2013 several vendors have 
-  delivered full featured versions of their compiler suite. C++11 redefines
-  what it means to write C++ code, it is simpler to use, more efficient, 
+  delivered full featured versions of their compiler suite. 
+  C++11 redefines what it means to write C++ code, it is simpler to use, more efficient, 
   more concise and more comprehensive than previous versions of the 
   standard. This article is an example based walkthrough of some of the features 
   of C++11 that might be relevant to R users and developpers of 
@@ -24,17 +24,41 @@
 
 Extending R with compiled code is a great way to achieve good performance. 
 Using C++ to rewrite critical parts has become a popular approach
-in R package development. 
+in R package development, mainly thanks to facilities 
+provided by the Rcpp C++ library initially distributed as the 
+\CRANpkg{Rcpp} package. The \code{Rcpp} 
+library\footnote{I do mean \emph{library} here -- not \emph{package} --
+and throughout this paper, \code{Rcpp} will refer 
+to the C++ library that is contained in various implementations, 
+such as \CRANpkg{Rcpp}, \CRANpkg{Rcpp98} or \CRANpkg{Rcpp11}. } 
+contains classes and various facilities that streamlines 
+production of packages using C++ code, vastly improving the experience
+that otherwise involves using arcane macros and C functions of the 
+internal R api. 
 
-With the release of long awaited C++11 standard~\citep{Cpp11}, 
-the C++ Standards Commitee has changed the meaning of C++, making it 
-a language that is nicer to use and teach. For a complete 
-reference of C++11, see~\citep{Stroustrup2013}
+As much as I'm willing to praise the merits of the \code{Rcpp} library, and 
+as much as I am obviously biased about it, 
+one of the key thing it brings does not come from the code itself, but from 
+the incentive of using C++ to express ideas. With its multi-paradigm
+nature, C++ is a great vessel, and it just got better with the release of the 
+new\footnote{The term \emph{new} used is can be misleading as
+C++11 was actually released two years before this article. C++11 is however 
+only newly available to regular C++ programmers using compilers of their 
+platform of choice.} C++11 standard~\citep{Cpp11}. C++11 is many things, a puzzle 
+made of many pieces that all fit together, it almost feels like a new language, 
+and however it is alsmot entirely backward compatible, you will quickly get in the 
+habit of writing code using C++11 and will likely find it difficult to 
+look back. This article highlights a few features of C++11, through a simple
+enough leitmotiv example. Full coverage of the added features in
+C++11 is beyond the scope here, the reader might refer to~\citep{Stroustrup2013}
+for a comprehensive description of C++, as a whole, not necessarily a review
+of the added features of C++11.
 
-This article has two goals, 
-showing a few examples of C++11 language features that might be 
-relevant to R package development, and introducing
-Rcpp11, a complete C++11 redesign of \CRANpkg{Rcpp}. 
+Finally, this paper gives a quick introduction to \CRANpkg{Rcpp11}, 
+a complete C++11 centric redesign of \CRANpkg{Rcpp}. \CRANpkg{Rcpp11} will 
+provide solid foundations for extending R with C++11 code for years to come. 
+The obvious enquiry of \emph{why do this in a new package rather than just
+update Rcpp} will be discussed in the relevant section. 
 
 \section{leitmotiv}
 
@@ -349,6 +373,11 @@ regular expressions
 unordered maps and sets. were available in TR1, which used to be a pain. is it there, is it not there ...
 
 \section{Rcpp11}
+
+\CRANpkg{Rcpp} comes with a strong promise of stability and 
+background compatibility. While this might be a good thing in general, 
+these requirements put a lot of weight in the evolution scale of the 
+underlying C++ library. 
 
 TODO: 
 Complete redesign of Rcpp. 
