@@ -132,9 +132,8 @@ Given \code{NumericVector} implements the range concept, a more C++ idiomatic
 way of approaching the problem is to use an algorithm from the Standard
 Template Library. The \code{count\_if} that was introduced
 in C++11 algorithm is a natural fit, \code{count\_if} iterates through a vector
-and counts the number of times the specified predicate is true. 
-
-Before C++11, we would express the predicate using a named function that is defined
+and counts the number of times the specified predicate is true. Before C++11, 
+we would express the predicate using a named function that is defined
 elsewhere: 
 
 \begin{example}
@@ -148,7 +147,7 @@ int count_positive(NumericVector x){
 }
 \end{example}
 
-We can also use a compatible callable object to capture some context. The 
+We can also use a callable object to capture some context. The 
 following chunk uses the \code{is\_greater} class to capture both the 
 intended comparison with a carefully selected name and the threshold (0.0) ;
 
@@ -189,18 +188,23 @@ would do with the apply family of functions. The ability to define
 functions right at the call site is what was dramatically missing in order
 to make the standard template library as useful as it can be. 
 
+This gives the perfect incentive to revisit the STL and learn about some
+algorithms that were introduced in C++11.  
+
 \section{Concurrency}
 
 As described by \citep{sutter2005}, the performance free lunch is over. Processors
 are no longer getting much faster. It is however becoming 
 increasingly common that machines are equiped with multiple core processors, or
 even multiple processors. In order to make the most of these
-capabilities, software must use the available hardware concurrency. 
+capabilities, software must take advantage of the available hardware 
+concurrency, we cannot any longer sit back and wait for processors to be faster 
+and magically make our code faster. 
 
 Concurrency is not a new thing, C++ programmers have been writing concurrent
 code for some time, what is new with C++11 is that concurrency 
-is officially supported by the standard. Where you previoulsy 
-would have needed to use platform specific facilities 
+is officially supported by the standard, this changes evrrything. 
+Where you previoulsy would have needed to use platform specific facilities 
 third party abstractions built around them, you can now take advantage
 of threads, mutexes, futures and promises offered by the C++ standard 
 library. It makes quite a big difference for developping 
