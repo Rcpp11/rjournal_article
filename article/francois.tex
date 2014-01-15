@@ -1,70 +1,70 @@
 % !TeX root = RJwrapper.tex
 \title{R and C++11}
-\author{by Romain François}
+\author{by Romain François, with contributions from Kevin Ushey}
 
 \maketitle
 
 \abstract{
   The success of \CRANpkg{Rcpp}~\citep{CRAN:Rcpp} for extending R
-  with packages shipping C++ code is indisputable. \CRANpkg{Rcpp} has 
-  shaped the landscape of performance code for statistical software 
-  distributed by means of R packages. In 2011, the C++ Standards 
-  commitee has finally released the C++11 
-  standard~\citep{Cpp11} and in 2013 several vendors have 
-  delivered full featured versions of their compiler suite. 
-  C++11 redefines what it means to write C++ code, it is simpler to use, more efficient, 
-  more concise and more comprehensive than previous versions of the 
-  standard. This article is an example based walkthrough of some of the features 
-  of C++11 that might be relevant to R users and developpers of 
-  R packages that use C++ code. This also introduces the 
-  \CRANpkg{Rcpp11} package, a complete C++11-centric rewrite of \CRANpkg{Rcpp}. 
+  with packages shipping C++ code is indisputable. \CRANpkg{Rcpp} has
+  shaped the landscape of performance code for statistical software
+  distributed by means of R packages. In 2011, the C++ Standards
+  commitee has finally released the C++11
+  standard~\citep{Cpp11} and in 2013 several vendors have
+  delivered full featured versions of their compiler suite.
+  C++11 redefines what it means to write C++ code, it is simpler to use, more efficient,
+  more concise and more comprehensive than previous versions of the
+  standard. This article is an example based walkthrough of some of the features
+  of C++11 that might be relevant to R users and developpers of
+  R packages that use C++ code. This also introduces the
+  \CRANpkg{Rcpp11} package, a complete C++11-centric rewrite of \CRANpkg{Rcpp}.
 }
 
 \section{Introduction}
 
-Extending R with compiled code is a great way to achieve good performance. 
+Extending R with compiled code is a great way to achieve good performance.
 Using C++ to rewrite critical parts has become a popular approach
-in R package development, mainly thanks to facilities 
-provided by the Rcpp C++ library initially distributed as the 
-\CRANpkg{Rcpp} package. The \code{Rcpp} 
+in R package development, mainly thanks to facilities
+provided by the Rcpp C++ library initially distributed as the
+\CRANpkg{Rcpp} package. The \code{Rcpp}
 library\footnote{I do mean \emph{library} here -- not \emph{package} --
-and throughout this paper, \code{Rcpp} will refer 
-to the C++ library that is contained in various implementations, 
-such as \CRANpkg{Rcpp}, \CRANpkg{Rcpp98} or \CRANpkg{Rcpp11}. } 
-contains classes and various facilities that streamlines 
+and throughout this paper, \code{Rcpp} will refer
+to the C++ library that is contained in various implementations,
+such as \CRANpkg{Rcpp}, \CRANpkg{Rcpp98} or \CRANpkg{Rcpp11}. }
+contains classes and various facilities that streamlines
 production of packages using C++ code, vastly improving the experience
-that otherwise involves using arcane macros and C functions of the 
-internal R api. 
+that otherwise involves using arcane macros and C functions of the
+internal R api.
 
-As much as I'm willing to praise the merits of the \code{Rcpp} library, and 
-as much as I am obviously biased about it, 
-one of the key thing it brings does not come from the code itself, but from 
+As much as I'm willing to praise the merits of the \code{Rcpp} library, and
+as much as I am obviously biased about it,
+one of the key thing it brings does not come from the code itself, but from
 the incentive of using C++ to express ideas. With its multi-paradigm
-nature, C++ is a great vessel, and it just got better with the release of the 
+nature, C++ is a great vessel, and it just got better with the release of the
 new\footnote{The term \emph{new} used is can be misleading as
-C++11 was actually released two years before this article. C++11 is however 
-only newly available to regular C++ programmers using compilers of their 
-platform of choice.} C++11 standard~\citep{Cpp11}. C++11 is many things, a puzzle 
-made of many pieces that all fit together, it almost feels like a new language, 
-and however it is alsmot entirely backward compatible, you will quickly get in the 
-habit of writing code using C++11 and will likely find it difficult to 
+C++11 was actually released two years before this article. C++11 is however
+only newly available to regular C++ programmers using compilers of their
+platform of choice.} C++11 standard~\citep{Cpp11}. C++11 is many things, a puzzle
+made of many pieces that all fit together, it almost feels like a new language,
+and however it is alsmot entirely backward compatible, you will quickly get in the
+habit of writing code using C++11 and will likely find it difficult to
 look back. This article highlights a few features of C++11, through a simple
 enough leitmotiv example. Full coverage of the added features in
 C++11 is beyond the scope here, the reader might refer to~\citep{Stroustrup2013}
 for a comprehensive description of C++, as a whole, not necessarily a review
 of the added features of C++11.
 
-Finally, this paper gives a quick introduction to \CRANpkg{Rcpp11}, 
-a complete C++11 centric redesign of \CRANpkg{Rcpp}. \CRANpkg{Rcpp11} will 
-provide solid foundations for extending R with C++11 code for years to come. 
+Finally, this paper gives a quick introduction to \CRANpkg{Rcpp11},
+a complete C++11 centric redesign of \CRANpkg{Rcpp}. \CRANpkg{Rcpp11} will
+provide solid foundations for extending R with C++11 code for years to come.
 The obvious enquiry of \emph{why do this in a new package rather than just
-update Rcpp} will be discussed in the relevant section. 
+update Rcpp} will be discussed in the relevant section.
 
 \section{leitmotiv}
 
 Consider the simple problem of counting the number of positive values
-from a numeric vector. We will use this problem as a leitmotiv for the 
-article, gradually introducting C++11 features.  
+from a numeric vector. We will use this problem as a leitmotiv for the
+article, gradually introducting C++11 features.
 We can easily express this as a straightforward R function:
 
 \begin{example}
@@ -73,12 +73,12 @@ count_positive <- function(x){
 }
 \end{example}
 
-Taking advantage of R vectorisation of the \code{>} binary operator, this 
-function is as good as it gets. We will see later that this vectorisation 
-comes at a steep price in terms of memory and time, both impacting the 
-performance, but for now let's concentrate on the basics and 
-rewrite the function using a simple for loop over elements of a 
-\code{NumericVector}. 
+Taking advantage of R vectorisation of the \code{>} binary operator, this
+function is as good as it gets. We will see later that this vectorisation
+comes at a steep price in terms of memory and time, both impacting the
+performance, but for now let's concentrate on the basics and
+rewrite the function using a simple for loop over elements of a
+\code{NumericVector}.
 
 \begin{example}
 // [[Rcpp::export]]
@@ -89,15 +89,15 @@ int count_positive(NumericVector x){
 }
 \end{example}
 
-While the R version had to allocate memory for a temporary logical 
-vector, traverse the input data to fill this temporary object, then 
-traverse this temporary logical vector to sum the values equal to \code{TRUE}, 
-the C++ version is essentially a simple for loop. 
+While the R version had to allocate memory for a temporary logical
+vector, traverse the input data to fill this temporary object, then
+traverse this temporary logical vector to sum the values equal to \code{TRUE},
+the C++ version is essentially a simple for loop.
 
 \section{Range based for loops}
 
-The previous code chunk uses a typical C++ \code{for} loop, directly 
-inherited from C. C++11 introduces range based for loops, which have 
+The previous code chunk uses a typical C++ \code{for} loop, directly
+inherited from C. C++11 introduces range based for loops, which have
 closer semantics to the loop we would use in R, usually known as
 for/each loops. We can revisit the example using a range based for loop:
 
@@ -112,19 +112,19 @@ int count_positive(NumericVector x){
 }
 \end{example}
 
-This is possible because the \code{NumericVector} class implements 
-the range concept with \code{begin} and \code{end} member functions. This 
+This is possible because the \code{NumericVector} class implements
+the range concept with \code{begin} and \code{end} member functions. This
 \code{for} loop is simpler to read than the general C++ \code{for} loop. It is also
-more efficient than a badly written general for loop. It is fairly 
-common to see the loop expressed as \code{for(int i=0; i<x.size(); i++)} which 
-will perform badly as it has to evaluate \code{x.size()} at each iteration. 
-Depending on the compiler's optimisation aggressiveness, this might have a 
-dramatic impact on performance. The simpler \code{for} loop does not 
-have this problem as it simply processes each element in the range between 
-\code{begin()} and \code{end()}. It also has the advantage of 
+more efficient than a badly written general for loop. It is fairly
+common to see the loop expressed as \code{for(int i=0; i<x.size(); i++)} which
+will perform badly as it has to evaluate \code{x.size()} at each iteration.
+Depending on the compiler's optimisation aggressiveness, this might have a
+dramatic impact on performance. The simpler \code{for} loop does not
+have this problem as it simply processes each element in the range between
+\code{begin()} and \code{end()}. It also has the advantage of
 resembling the R loop, although using the semicolon instead of the \code{in} keyword
 and requiring us to specify the type of the looping variable \code{d} as C++
-is a strongly typed language.  
+is a strongly typed language.
 
 \section{Lambda functions}
 
@@ -132,9 +132,9 @@ Given \code{NumericVector} implements the range concept, a more C++ idiomatic
 way of approaching the problem is to use an algorithm from the Standard
 Template Library. The \code{count\_if} that was introduced
 in C++11 algorithm is a natural fit, \code{count\_if} iterates through a vector
-and counts the number of times the specified predicate is true. Before C++11, 
+and counts the number of times the specified predicate is true. Before C++11,
 we would express the predicate using a named function that is defined
-elsewhere: 
+elsewhere:
 
 \begin{example}
 inline bool is_positive(double x){
@@ -147,19 +147,19 @@ int count_positive(NumericVector x){
 }
 \end{example}
 
-We can also use a callable object to capture some context. The 
-following chunk uses the \code{is\_greater} class to capture both the 
+We can also use a callable object to capture some context. The
+following chunk uses the \code{is\_greater} class to capture both the
 intended comparison with a carefully selected name and the threshold (0.0) ;
 
 \begin{example}
 class is_greater {
 public:
   is_greater( double threshold_) : threshold(threshold_){}
-  
+
   inline bool operator()(double x){
     return x > threshold ;
   }
-  
+
 private:
   double threshold ;
 }
@@ -169,64 +169,64 @@ int count_positive(NumericVector x){
 }
 \end{example}
 
-With lambdas, C++11 offers a much nicer way to define the predicate, right at the 
-call place. Lambdas make the STL much more useful as it eliminates 
+With lambdas, C++11 offers a much nicer way to define the predicate, right at the
+call place. Lambdas make the STL much more useful as it eliminates
 many boiler plate code that was previously needed:
 
 \begin{example}
 // [[Rcpp::export]]
 int count_positive(NumericVector x){
-  return std::count_if( x.begin(), x.end(), 
+  return std::count_if( x.begin(), x.end(),
     [](double d){ return d > 0 ;}
   ) ;
 }
 \end{example}
 
-The syntax might look strange and terse at first sight, but conceptually 
+The syntax might look strange and terse at first sight, but conceptually
 using lambda functions in C++ is very similar to what typical R users
-would do with the apply family of functions. The ability to define 
+would do with the apply family of functions. The ability to define
 functions right at the call site is what was dramatically missing in order
-to make the standard template library as useful as it can be. 
+to make the standard template library as useful as it can be.
 
 This gives the perfect incentive to revisit the STL and learn about some
-algorithms that were introduced in C++11.  
+algorithms that were introduced in C++11.
 
 \section{Concurrency}
 
 As described by \citep{sutter2005}, the performance free lunch is over. Processors
-are no longer getting much faster. It is however becoming 
+are no longer getting much faster. It is however becoming
 increasingly common that machines are equiped with multiple core processors, or
 even multiple processors. In order to make the most of these
-capabilities, software must take advantage of the available hardware 
-concurrency, we cannot any longer sit back and wait for processors to be faster 
-and magically make our code faster. 
+capabilities, software must take advantage of the available hardware
+concurrency, we cannot any longer sit back and wait for processors to be faster
+and magically make our code faster.
 
 Concurrency is not a new thing, C++ programmers have been writing concurrent
-code for some time, what is new with C++11 is that concurrency 
-is officially supported by the standard, this changes evrrything. 
-Where you previoulsy would have needed to use platform specific facilities 
+code for some time, what is new with C++11 is that concurrency
+is officially supported by the standard, this changes evrrything.
+Where you previoulsy would have needed to use platform specific facilities
 third party abstractions built around them, you can now take advantage
-of threads, mutexes, futures and promises offered by the C++ standard 
-library. It makes quite a big difference for developping 
-R packages that ought to be distributed to repositories targetting 
-multiple plaforms, such as CRAN. 
+of threads, mutexes, futures and promises offered by the C++ standard
+library. It makes quite a big difference for developping
+R packages that ought to be distributed to repositories targetting
+multiple plaforms, such as CRAN.
 
 Writing concurrent code is more work, debugging it is more difficult as we need
-to watch for new sources of problems such as race conditions and deadlocks. But 
-if we are careful enough and only use concurrency in the right place, it can 
+to watch for new sources of problems such as race conditions and deadlocks. But
+if we are careful enough and only use concurrency in the right place, it can
 have a great impact on performance, an impact that will scale with the
-hardware capabilities. 
+hardware capabilities.
 
 Let's factor out the body of the function used in the previous code chunk
-into a function operating on a range (\code{count\_positive\_range}), 
-and rewrite the \code{count\_positive} function in terms of 
+into a function operating on a range (\code{count\_positive\_range}),
+and rewrite the \code{count\_positive} function in terms of
 \code{count\_positive\_range}
 
 \begin{example}
 typedef NumericVector::iterator Iterator ;
 
 inline int count_positive_range(Iterator begin, Iterator end){
-  return std::count_if( begin, end, 
+  return std::count_if( begin, end,
     [](double d){ return d > 0 ;}
   ) ;
 }
@@ -237,11 +237,11 @@ int count_positive(NumericVector x){
 }
 \end{example}
 
-Thanks to inlining, both implementations are identical. The benefit of 
-this abstraction is that \code{count\_positive\_range} could now 
-operate on a smaller range. As it simplest we could count the 
-number of positives on the first half of the data and add it to 
-the count of positives from the second half. 
+Thanks to inlining, both implementations are identical. The benefit of
+this abstraction is that \code{count\_positive\_range} could now
+operate on a smaller range. As it simplest we could count the
+number of positives on the first half of the data and add it to
+the count of positives from the second half.
 
 \begin{example}
 // [[Rcpp::export]]
@@ -250,53 +250,53 @@ int count_positive(NumericVector x){
   Iterator start  = x.begin() ;
   int first_half  = count_positive_range(start, start+n/2) ;
   int second_half = count_positive_range(start+n/2, x.end() ) ;
-  
-  return first_half + second_half ; 
+
+  return first_half + second_half ;
 }
 \end{example}
 
-This of course does not take advantage of threading as the second 
-calculation has to wait for the first one to finish. Writing concurrent 
+This of course does not take advantage of threading as the second
+calculation has to wait for the first one to finish. Writing concurrent
 code is about running these two (and potentially more up to the available
-hardware concurrency) tasks in parallel in separate threads. 
+hardware concurrency) tasks in parallel in separate threads.
 This section is not meant as a full reference on threading techniques
-or coverage of the facilities of the standard library for writing 
-concurrent code as can be found in \citep{williams2012} or the 
+or coverage of the facilities of the standard library for writing
+concurrent code as can be found in \citep{williams2012} or the
 relevant chapters of \citep{Stroustrup2013}.
 
 Here is an initial implementation using a separate thread to process
-the first half of the data while the main thread process the remaining: 
+the first half of the data while the main thread process the remaining:
 
 \begin{example}
 // [[Rcpp::export]]
 int count_positive_2threads(NumericVector x){
   int n = x.size() ;
   Iterator it = x.begin() ;
-                                         
+
   std::packaged_task<int(Iterator,Iterator)> task( &count_positive_range ) ;
   std::future<int> first_half = task.get_future() ;
-  std::thread t( std::move(task), it, it+n/2 ) ;            
-  
+  std::thread t( std::move(task), it, it+n/2 ) ;
+
   int second_half = count_positive_range(it+n/2, x.end() ) ;
   t.join() ;
-  
+
   return first_half.get() + second_half ;
 }
 \end{example}
 
 A \code{thread} itself does not return a value, so here we use it in conjunction
-with a \code{packaged\_task}, which gives us a way of getting hold of the result, 
+with a \code{packaged\_task}, which gives us a way of getting hold of the result,
 as a \code{future}. In this chunk the main thread counts the positive
-values in the second half of the data while the thread \code{t} is counting the 
+values in the second half of the data while the thread \code{t} is counting the
 number of positives in the first half of the data. When the main thread has finished
 its own work, we \code{join} the worker thread, this blocks the main thread until
 the worker thread has finished, so that the value associated with the
-future can correctly be retrieved. 
+future can correctly be retrieved.
 
-Advanced thread management techniques are outside the scope of this 
-article. Let's however generalize the previous chunk by splitting the work 
+Advanced thread management techniques are outside the scope of this
+article. Let's however generalize the previous chunk by splitting the work
 into several threads. We can simply use a vector of threads to run the smaller
-tasks and collect the results with a vector of futures. 
+tasks and collect the results with a vector of futures.
 
 \begin{example}
 typedef std::packaged_task<int(Iterator,Iterator)> Task ;
@@ -304,86 +304,86 @@ typedef std::packaged_task<int(Iterator,Iterator)> Task ;
 // [[Rcpp::export]]
 int count_positive_threaded(NumericVector data, int nthreads){
   int n = data.size() ;
-  int chunk_size = n / nthreads ; 
-  
+  int chunk_size = n / nthreads ;
+
   std::vector<std::future<int>> futures(nthreads-1) ;
   std::vector<std::thread> threads(nthreads-1) ;
-  
+
   Iterator it = data.begin() ;
   for( int i=0; i<nthreads-1; i++){
-    count_positive counter ;        
+    count_positive counter ;
     Task task(counter) ;
     futures[i] = task.get_future();
     threads[i] = std::thread( std::move(task), it, it + chunk_size ) ;
     it += chunk_size ;
   }
-  
-  int result = count_positive()(it, data.end()); 
-  
+
+  int result = count_positive()(it, data.end());
+
   for( int i=0; i<nthreads-1; i++){
     threads[i].join() ;
-    result += futures[i].get() ;  
+    result += futures[i].get() ;
   }
-                            
+
   return result ;
 }
 \end{example}
 
 Concurrency as its cost. First of all the code is more complicated
-to write, to understand and to debug. We also must not assume that 
-running $N$ jobs in parallel will improve the performance by a factor 
-of $N$. Table~\ref{table:count} presents some benchmarks with various 
-data sizes (from $10^5$ to $ 10^9$) and various number of threads. 
-On the machine used when writing this article, 
+to write, to understand and to debug. We also must not assume that
+running $N$ jobs in parallel will improve the performance by a factor
+of $N$. Table~\ref{table:count} presents some benchmarks with various
+data sizes (from $10^5$ to $ 10^9$) and various number of threads.
+On the machine used when writing this article,
 the \code{std::thread::hardware\_concurrency} function hints that 8 threads
-are supported. 
-           
-Timings of the pure R function correctly reflect typical issues of 
+are supported.
+
+Timings of the pure R function correctly reflect typical issues of
 vectorisation, the R version has to first allocate a logical vector
 as big as the input data to host the result of the comparison \code{x>0}, before
-starting counting the positives in that logical vector. Allocating 
-memory takes time, and increases the chances of triggering garbage collection, 
-which also takes time. 
+starting counting the positives in that logical vector. Allocating
+memory takes time, and increases the chances of triggering garbage collection,
+which also takes time.
 
-The serial C++ version is a massive improvement over the R version. Further 
-improvement is given with multithreaded code. The timings also illustrate 
+The serial C++ version is a massive improvement over the R version. Further
+improvement is given with multithreaded code. The timings also illustrate
 the inherent cost of threads. When the data size is too small, using threads
 actually degrades the whole performance. Arguably the problem used here
-is quite simple, and different problem will exhibit different gains 
+is quite simple, and different problem will exhibit different gains
 induced by using threads. There is no universal rule for how to split
-the work between threads, and the usual advice of actually measuring 
-run time instead of relying on educated guesses stands with thread code, more than 
-ever. 
+the work between threads, and the usual advice of actually measuring
+run time instead of relying on educated guesses stands with thread code, more than
+ever.
 
 \begin{table}
 \centering
 \begin{tabular}{lrrrrr}
-\toprule 
-$n$ & $10^5$ & $10^6$ & $10^7$ & $10^8$ & $10^9$ \\ 
-\midrule          
+\toprule
+$n$ & $10^5$ & $10^6$ & $10^7$ & $10^8$ & $10^9$ \\
+\midrule
 R         & 0.43          & 3.32  & 34.42 & 467.03 & 4\,977.05 \\
 serial    & \textbf{0.09} & 0.91  &  9.25 &  97.59 &    854.21 \\
-\hspace{1.5cm} & 
-\hspace{1.5cm} & 
 \hspace{1.5cm} &
-\hspace{1.5cm} & 
-\hspace{1.5cm} & 
+\hspace{1.5cm} &
+\hspace{1.5cm} &
+\hspace{1.5cm} &
+\hspace{1.5cm} &
 \hspace{1.5cm} \\
 2 threads & 0.12          & 0.42          & 4.91          &  49.37          & 496.15          \\
 4 threads & 0.15          & \textbf{0.35} & 2.76          &  \textbf{37.47} & 376.31          \\
 8 threads & 0.18          & 0.36          & \textbf{2.57} &  37.70          & \textbf{371.98} \\
 \bottomrule
 \end{tabular}
-\caption{\label{table:count}Run times (ms). Median run times between 10 runs.\\ 
-{\footnotesize Timings performed on a Mac Book Pro with a 2.3 GHz Intel Core i7 processor (4 cores), 16Go of RAM. 
-Compiled with clang++ version 3.3 with the flags : \code{-g -O3}. R version 3.0.2 
+\caption{\label{table:count}Run times (ms). Median run times between 10 runs.\\
+{\footnotesize Timings performed on a Mac Book Pro with a 2.3 GHz Intel Core i7 processor (4 cores), 16Go of RAM.
+Compiled with clang++ version 3.3 with the flags : \code{-g -O3}. R version 3.0.2
 as distributed by the CRAN binary for OSX. Best performance is typeset in bold for each data size. }}
 \end{table}
 
 \section{Other useful additions to the standard}
 
-TODO: 
-these features don't fit with the fil rouge, maybe just write a paragraph for each. 
+TODO:
+these features don't fit with the fil rouge, maybe just write a paragraph for each.
 
 auto and decltype
 
@@ -397,59 +397,113 @@ unordered maps and sets. were available in TR1, which used to be a pain. is it t
 
 \section{Rcpp11}
 
-\CRANpkg{Rcpp} comes with a strong promise of stability and 
-background compatibility. While this might be a good thing in general, 
-these requirements put a lot of weight in the evolution scale of the 
-underlying C++ library. 
+\CRANpkg{Rcpp} comes with a strong promise of stability and
+background compatibility. While this might be a good thing in general,
+these requirements put a lot of weight in the evolution scale of the
+underlying C++ library. Embracing C++11 has greatly simplified the internal
+implementation of \CRANpkg{Rcpp11}, and divorcing this implementation from
+\CRANpkg{Rcpp} allows us to undo previous errors in design that had crept into
+\CRANpkg{Rcpp}.
 
-TODO: 
-Complete redesign of Rcpp. 
+\subsection{Implementation Improvements}
+
+no more datetime classes
+header only
+etc...
+
+\subsection{Variadic Templates}
+
+In particular, the use of \textbf{variadic templates} has allowed the removal
+of auto-generated code bloat present in \CRANpkg{Rcpp}. Such code bloat was
+necessary in order to support methods taking variable numbers of arguments
+(analogous to an R function taking \ldots arguments). Variadic templates allow
+us to achieve this in C++11 with a far cleaner implementation.
+
+For example, the \texttt{Vector} classes in \CRANpkg{Rcpp} have \texttt{create}
+methods, allowing a user to generate vectors like:
+
+\begin{example}
+// [[Rcpp::export]]
+List make_list() {
+  return List::create(
+    _["a"] = 1,
+    _["b"] = 2,
+    _["c"] = 3
+  )
+}
+\end{example}
+
+However, achieving this in \CRANpkg{Rcpp} requires that a \textit{separate method} is
+defined for each of the potential number of arguments that could be passed. Currently,
+\CRANpkg{Rcpp}'s \texttt{create} supports up to twenty arguments passed,
+requiring a lot of auto-generated code bloat (about 1200 lines of code in total).
+In contrast, \CRANpkg{Rcpp11}'s create method is defined quite simply:
+
+\begin{example}
+template <typename... Args>
+Vector<RTYPE, StoragePolicy> Vector<RTYPE,StoragePolicy>::create(Args... args){
+  return typename create_type<RTYPE, Args...>::type( args... ) ;
+}
+\end{example}
+
+This declaration defines create as a function taking a variable number of
+arguments (from zero to a compiler-defined maximum). No code bloat; functions
+are generated as required by the compiler when seen in user code.
+
+A substantial portion of the code base in \CRANpkg{Rcpp} was auto-generated to
+handle such situations, primarily in the modules framework -- roughly 59k lines (!)
+of auto-generated code are present in the \texttt{inst/include/generated}
+directory (excluding headers), which are all now unnecessary and removed from
+\CRANpkg{Rcpp11}.
+
+TODO:
+Complete redesign of Rcpp.
 Header only. Assumes C++11.
-Much smaller (elimininated lots of code bloat). 
-Cleaner (got rid of some ghosts). 
-Threaded sugar. 
+Much smaller (elimininated lots of code bloat).
+Cleaner (got rid of some ghosts).
+Threaded sugar.
 
 \section{Beyond C++11}
 
-During development, C++11 was called C++0x in the hope that it would have been 
+During development, C++11 was called C++0x in the hope that it would have been
 released some time before 2010. The changes from previous versions of C++
 were important, therefore it could only be released officially in 2011. People
-often say that C++11 is indeed C++0x in hexadecimal (with $x$ equal to $b$). 
+often say that C++11 is indeed C++0x in hexadecimal (with $x$ equal to $b$).
 
 However, the pace of the C++ standards has dramatically increased. A new version
-of the standard is expected in 2014, and is likely to be backed by at least 
+of the standard is expected in 2014, and is likely to be backed by at least
 two major compiler suites (gcc and clang) the same year. C++14 is expected to
-be a minor bug fix release. 
+be a minor bug fix release.
 
-The next major release is currently schedule for 2017. For this major 
-update of the standard, the commitee has split the work into several 
+The next major release is currently schedule for 2017. For this major
+update of the standard, the commitee has split the work into several
 working groups, e.g. Core, Evolution, Concurrency, Modules, Reflection, to name
-a few. 
+a few.
 
 Although we had to wait until 2013 to see compiler fully support C++11, and
-R 3.1.0 for explicit support for packages using C++11 code, things are likely 
-to move faster for upcoming versions of the C++ Standard. 
+R 3.1.0 for explicit support for packages using C++11 code, things are likely
+to move faster for upcoming versions of the C++ Standard.
 
 \section{Conclusion}
 
 With a simple example, this article reviewed a few features from
-the C++11 standard through the lence of habits and needs of R programmers. 
+the C++11 standard through the lence of habits and needs of R programmers.
 Conceptually simple features such as range based for loops and lambda functions
 make C++ a language closer to R. This article also scratched the surface
-of multi-threaded code using built in support from the standard library. 
+of multi-threaded code using built in support from the standard library.
 
 C++11 is still somewhat new, and it can be argued that not every platform
 where R is expected to be used has access to a decent C++11 compiler. Therefore
-for a package developper choosing C++11 now might entice some sacrifices. There is a 
+for a package developper choosing C++11 now might entice some sacrifices. There is a
 choice to be made between using a nicer language that will enable us to write
-better software or conservatively stay with C++98 which is 
-almost universally available accross the plaform known to be supported by R. 
+better software or conservatively stay with C++98 which is
+almost universally available accross the plaform known to be supported by R.
 While moving to C++11 comes with friction from platforms that are not equiped
-with the correct tools, I would argue that staying 
-with C++98 also comes at a price. Indeed when starting to develop non trivial 
-code, we quickly want to use platform specific facilities or 
+with the correct tools, I would argue that staying
+with C++98 also comes at a price. Indeed when starting to develop non trivial
+code, we quickly want to use platform specific facilities or
 third party libraries. With the addition of features such threading, hash maps and lambda
-functions into the standard, C++11 is a breath of fresh air. Let's breathe.  
+functions into the standard, C++11 is a breath of fresh air. Let's breathe.
 
 \bibliography{Francois}
 
@@ -458,5 +512,11 @@ functions into the standard, C++11 is a breath of fresh air. Let's breathe.
     1 place de l'égalité. 42400 Saint Chamond\\
     FRANCE }
 \email{romain@r-enthusiasts.com}
-    
 
+\bibliography{Ushey}
+
+\address{Kevin Ushey\\
+  Statistical Programmer\\
+  Fred Hutchinson Cancer Research Center\\
+  Seattle, WA, USA}
+\email{kushey@fhcrc.org}

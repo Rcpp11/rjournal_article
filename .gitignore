@@ -6,3 +6,5 @@
 *.blg
 *.brf
 
+.Rproj.user
+*.Rproj
