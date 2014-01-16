@@ -381,7 +381,7 @@ serial    & \textbf{0.09} & 0.91  &  9.25 &  97.59 &    854.21 \\
 \bottomrule
 \end{tabular}
 \caption{\label{table:count}Run times (ms). Median run times between 10 runs.\\
-{\footnotesize Timings performed on a Mac Book Pro with a 2.3 GHz Intel Core i7 processor (4 cores), 16Go of RAM.
+{\footnotesize Timings performed on a Mac Book Pro with a 2.3 GHz Intel Core i7 processor (4 cores), 16GB of RAM.
 Compiled with \code{clang++} version 3.3 with the flags : \code{-g -O3}. R version 3.0.2
 as distributed by the CRAN binary for OS X. Best performance is typeset in bold for each data size. }}
 \end{table}
@@ -455,7 +455,7 @@ Vector<RTYPE, StoragePolicy> Vector<RTYPE,StoragePolicy>::create(Args... args){
 This declaration defines create as a function taking a variable number of
 arguments (from zero to a compiler-defined maximum). No code bloat; functions
 are generated as required by the compiler when seen in user code. The
-\code{create_type} function ensures that proper dispatch is done based on the
+\code{create\_type} function ensures that proper dispatch is done based on the
 type of R object seen.
 
 A substantial portion of the code base in \CRANpkg{Rcpp} was auto-generated to
