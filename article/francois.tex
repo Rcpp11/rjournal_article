@@ -9,13 +9,13 @@
   with packages shipping C++ code is indisputable. \CRANpkg{Rcpp} has
   shaped the landscape of performance code for statistical software
   distributed by means of R packages. In 2011, the C++ Standards
-  commitee has finally released the C++11
+  committee has finally released the C++11
   standard~\citep{Cpp11} and in 2013 several vendors have
   delivered full featured versions of their compiler suite.
   C++11 redefines what it means to write C++ code, it is simpler to use, more efficient,
   more concise and more comprehensive than previous versions of the
   standard. This article is an example based walkthrough of some of the features
-  of C++11 that might be relevant to R users and developpers of
+  of C++11 that might be relevant to R users and developers of
   R packages that use C++ code. This also introduces the
   \CRANpkg{Rcpp11} package, a complete C++11-centric rewrite of \CRANpkg{Rcpp}.
 }
@@ -34,7 +34,7 @@ such as \CRANpkg{Rcpp}, \CRANpkg{Rcpp98} or \CRANpkg{Rcpp11}. }
 contains classes and various facilities that streamlines
 production of packages using C++ code, vastly improving the experience
 that otherwise involves using arcane macros and C functions of the
-internal R api.
+internal R API.
 
 As much as I'm willing to praise the merits of the \code{Rcpp} library, and
 as much as I am obviously biased about it,
@@ -46,7 +46,7 @@ C++11 was actually released two years before this article. C++11 is however
 only newly available to regular C++ programmers using compilers of their
 platform of choice.} C++11 standard~\citep{Cpp11}. C++11 is many things, a puzzle
 made of many pieces that all fit together, it almost feels like a new language,
-and however it is alsmot entirely backward compatible, you will quickly get in the
+and however it is almost entirely backward compatible, you will quickly get in the
 habit of writing code using C++11 and will likely find it difficult to
 look back. This article highlights a few features of C++11, through a simple
 enough leitmotiv example. Full coverage of the added features in
@@ -64,7 +64,7 @@ update Rcpp} will be discussed in the relevant section.
 
 Consider the simple problem of counting the number of positive values
 from a numeric vector. We will use this problem as a leitmotiv for the
-article, gradually introducting C++11 features.
+article, gradually introducing C++11 features.
 We can easily express this as a straightforward R function:
 
 \begin{example}
@@ -73,8 +73,8 @@ count_positive <- function(x){
 }
 \end{example}
 
-Taking advantage of R vectorisation of the \code{>} binary operator, this
-function is as good as it gets. We will see later that this vectorisation
+Taking advantage of R vectorization of the \code{>} binary operator, this
+function is as good as it gets. We will see later that this vectorization
 comes at a steep price in terms of memory and time, both impacting the
 performance, but for now let's concentrate on the basics and
 rewrite the function using a simple for loop over elements of a
@@ -118,7 +118,7 @@ the range concept with \code{begin} and \code{end} member functions. This
 more efficient than a badly written general for loop. It is fairly
 common to see the loop expressed as \code{for(int i=0; i<x.size(); i++)} which
 will perform badly as it has to evaluate \code{x.size()} at each iteration.
-Depending on the compiler's optimisation aggressiveness, this might have a
+Depending on the compiler's optimization aggressiveness, this might have a
 dramatic impact on performance. The simpler \code{for} loop does not
 have this problem as it simply processes each element in the range between
 \code{begin()} and \code{end()}. It also has the advantage of
@@ -195,7 +195,7 @@ algorithms that were introduced in C++11.
 
 As described by \citep{sutter2005}, the performance free lunch is over. Processors
 are no longer getting much faster. It is however becoming
-increasingly common that machines are equiped with multiple core processors, or
+increasingly common that machines are equipped with multiple core processors, or
 even multiple processors. In order to make the most of these
 capabilities, software must take advantage of the available hardware
 concurrency, we cannot any longer sit back and wait for processors to be faster
@@ -203,13 +203,13 @@ and magically make our code faster.
 
 Concurrency is not a new thing, C++ programmers have been writing concurrent
 code for some time, what is new with C++11 is that concurrency
-is officially supported by the standard, this changes evrrything.
-Where you previoulsy would have needed to use platform specific facilities
+is officially supported by the standard, this changes everything.
+Where you previously would have needed to use platform specific facilities
 third party abstractions built around them, you can now take advantage
 of threads, mutexes, futures and promises offered by the C++ standard
-library. It makes quite a big difference for developping
-R packages that ought to be distributed to repositories targetting
-multiple plaforms, such as CRAN.
+library. It makes quite a big difference for developing
+R packages that ought to be distributed to repositories targeting
+multiple platforms, such as CRAN.
 
 Writing concurrent code is more work, debugging it is more difficult as we need
 to watch for new sources of problems such as race conditions and deadlocks. But
@@ -339,7 +339,7 @@ the \code{std::thread::hardware\_concurrency} function hints that 8 threads
 are supported.
 
 Timings of the pure R function correctly reflect typical issues of
-vectorisation, the R version has to first allocate a logical vector
+vectorization, the R version has to first allocate a logical vector
 as big as the input data to host the result of the comparison \code{x>0}, before
 starting counting the positives in that logical vector. Allocating
 memory takes time, and increases the chances of triggering garbage collection,
@@ -459,7 +459,7 @@ directory (excluding headers), which are all now unnecessary and removed from
 TODO:
 Complete redesign of Rcpp.
 Header only. Assumes C++11.
-Much smaller (elimininated lots of code bloat).
+Much smaller (eliminated lots of code bloat).
 Cleaner (got rid of some ghosts).
 Threaded sugar.
 
@@ -476,7 +476,7 @@ two major compiler suites (gcc and clang) the same year. C++14 is expected to
 be a minor bug fix release.
 
 The next major release is currently schedule for 2017. For this major
-update of the standard, the commitee has split the work into several
+update of the standard, the committee has split the work into several
 working groups, e.g. Core, Evolution, Concurrency, Modules, Reflection, to name
 a few.
 
@@ -486,19 +486,19 @@ to move faster for upcoming versions of the C++ Standard.
 
 \section{Conclusion}
 
-With a simple example, this article reviewed a few features from
-the C++11 standard through the lence of habits and needs of R programmers.
+Through a few simple examples, this article has reviewed a few features from
+the C++11 standard through the lens of habits and needs of R programmers.
 Conceptually simple features such as range based for loops and lambda functions
 make C++ a language closer to R. This article also scratched the surface
 of multi-threaded code using built in support from the standard library.
 
 C++11 is still somewhat new, and it can be argued that not every platform
 where R is expected to be used has access to a decent C++11 compiler. Therefore
-for a package developper choosing C++11 now might entice some sacrifices. There is a
+for a package developer choosing C++11 now might entice some sacrifices. There is a
 choice to be made between using a nicer language that will enable us to write
 better software or conservatively stay with C++98 which is
-almost universally available accross the plaform known to be supported by R.
-While moving to C++11 comes with friction from platforms that are not equiped
+almost universally available across the platform known to be supported by R.
+While moving to C++11 comes with friction from platforms that are not equipped
 with the correct tools, I would argue that staying
 with C++98 also comes at a price. Indeed when starting to develop non trivial
 code, we quickly want to use platform specific facilities or
