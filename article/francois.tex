@@ -5,19 +5,24 @@
 \maketitle
 
 \abstract{
-  The success of \CRANpkg{Rcpp}~\citep{CRAN:Rcpp} for extending R
+  The success of \CRANpkg{Rcpp}~\citep{CRAN:Rcpp} in extending R
   with packages shipping C++ code is indisputable. \CRANpkg{Rcpp} has
-  shaped the landscape of performance code for statistical software
-  distributed by means of R packages. In 2011, the C++ Standards
-  committee has finally released the C++11
-  standard~\citep{Cpp11} and in 2013 several vendors have
+  shaped the landscape of performant code for statistical software
+  distributed by means of R packages. \CRANpkg{Rcpp} has been developed
+  with strict adherence to the C++98 standard, but due to a relative
+  lack flexibility built into this standard, implementation
+  of many features required a lot of code bloat.
+  In 2011, the C++ Standards committee released the C++11
+  standard~\citep{Cpp11} and in 2013, several vendors
   delivered full featured versions of their compiler suite.
-  C++11 redefines what it means to write C++ code, it is simpler to use, more efficient,
+  C++11 redefines what it means to write C++ code: it is simpler to use, more efficient,
   more concise and more comprehensive than previous versions of the
   standard. This article is an example based walkthrough of some of the features
   of C++11 that might be relevant to R users and developers of
-  R packages that use C++ code. This also introduces the
-  \CRANpkg{Rcpp11} package, a complete C++11-centric rewrite of \CRANpkg{Rcpp}.
+  R packages that use C++ code. The article also introduces the
+  \CRANpkg{Rcpp11} package, a complete C++11-centric rewrite of \CRANpkg{Rcpp},
+  and discusses a few features introduced in C++11 that greatly simplified
+  the internal implementation.
 }
 
 \section{Introduction}
@@ -27,38 +32,38 @@ Using C++ to rewrite critical parts has become a popular approach
 in R package development, mainly thanks to facilities
 provided by the Rcpp C++ library initially distributed as the
 \CRANpkg{Rcpp} package. The \code{Rcpp}
-library\footnote{I do mean \emph{library} here -- not \emph{package} --
-and throughout this paper, \code{Rcpp} will refer
+library\footnote{Throughout this paper, \code{Rcpp} will refer
 to the C++ library that is contained in various implementations,
-such as \CRANpkg{Rcpp}, \CRANpkg{Rcpp98} or \CRANpkg{Rcpp11}. }
+such as \CRANpkg{Rcpp}, \CRANpkg{Rcpp98} or \CRANpkg{Rcpp11}.}
 contains classes and various facilities that streamlines
 production of packages using C++ code, vastly improving the experience
 that otherwise involves using arcane macros and C functions of the
 internal R API.
 
-As much as I'm willing to praise the merits of the \code{Rcpp} library, and
-as much as I am obviously biased about it,
-one of the key thing it brings does not come from the code itself, but from
-the incentive of using C++ to express ideas. With its multi-paradigm
-nature, C++ is a great vessel, and it just got better with the release of the
+One of the greatest strengths of \CRANpkg{Rcpp} is its ability to
+seamlessly transfer R objects to C++ STL structures and back. This is
+especially important as it allows users of \CRANpkg{Rcpp} to express ideas
+and solve problems that might be better expressed in C++ than R.
+With its multi-paradigm
+nature, C++ is a great vessel, and is much improved with the release of the
 new\footnote{The term \emph{new} used is can be misleading as
 C++11 was actually released two years before this article. C++11 is however
 only newly available to regular C++ programmers using compilers of their
-platform of choice.} C++11 standard~\citep{Cpp11}. C++11 is many things, a puzzle
-made of many pieces that all fit together, it almost feels like a new language,
-and however it is almost entirely backward compatible, you will quickly get in the
+platform of choice.} C++11 standard~\citep{Cpp11}. C++11 is many things: a puzzle
+made of many pieces that all fit together. It almost feels like a new language,
+and you will quickly get in the
 habit of writing code using C++11 and will likely find it difficult to
-look back. This article highlights a few features of C++11, through a simple
-enough leitmotiv example. Full coverage of the added features in
+look back. This article highlights a few features of C++11 through a simple
+guiding example (\emph{leitmotiv}). Full coverage of the added features in
 C++11 is beyond the scope here, the reader might refer to~\citep{Stroustrup2013}
 for a comprehensive description of C++, as a whole, not necessarily a review
 of the added features of C++11.
 
-Finally, this paper gives a quick introduction to \CRANpkg{Rcpp11},
+Finally, this paper gives an introduction to \CRANpkg{Rcpp11},
 a complete C++11 centric redesign of \CRANpkg{Rcpp}. \CRANpkg{Rcpp11} will
-provide solid foundations for extending R with C++11 code for years to come.
+provide a solid foundation for extending R with C++11 code for years to come.
 The obvious enquiry of \emph{why do this in a new package rather than just
-update Rcpp} will be discussed in the relevant section.
+update Rcpp?} will be discussed later.
 
 \section{leitmotiv}
 
@@ -77,7 +82,7 @@ Taking advantage of R vectorization of the \code{>} binary operator, this
 function is as good as it gets. We will see later that this vectorization
 comes at a steep price in terms of memory and time, both impacting the
 performance, but for now let's concentrate on the basics and
-rewrite the function using a simple for loop over elements of a
+rewrite the function using a simple \code{for} loop over elements of a
 \code{NumericVector}.
 
 \begin{example}
@@ -97,9 +102,10 @@ the C++ version is essentially a simple for loop.
 \section{Range based for loops}
 
 The previous code chunk uses a typical C++ \code{for} loop, directly
-inherited from C. C++11 introduces range based for loops, which have
+inherited from C. C++11 introduces \textbf{range based for loops}, which have
 closer semantics to the loop we would use in R, usually known as
-for/each loops. We can revisit the example using a range based for loop:
+\textit{for-each} loops. We can revisit the example using a range based
+\code{for} loop:
 
 \begin{example}
 // [[Rcpp::export]]
@@ -113,13 +119,14 @@ int count_positive(NumericVector x){
 \end{example}
 
 This is possible because the \code{NumericVector} class implements
-the range concept with \code{begin} and \code{end} member functions. This
-\code{for} loop is simpler to read than the general C++ \code{for} loop. It is also
-more efficient than a badly written general for loop. It is fairly
+the range concept with \code{begin} and \code{end} member functions. In particular,
+this \code{for} loop does a far better job of expressing the
+\emph{programmer's intent} compared to the previous \code{for} loop. It is also
+more efficient than the previously defined \code{for} loop. It is fairly
 common to see the loop expressed as \code{for(int i=0; i<x.size(); i++)} which
-will perform badly as it has to evaluate \code{x.size()} at each iteration.
+will perform poorly as it has to evaluate \code{x.size()} at each iteration.
 Depending on the compiler's optimization aggressiveness, this might have a
-dramatic impact on performance. The simpler \code{for} loop does not
+dramatic impact on performance. The range-based \code{for} loop does not
 have this problem as it simply processes each element in the range between
 \code{begin()} and \code{end()}. It also has the advantage of
 resembling the R loop, although using the semicolon instead of the \code{in} keyword
@@ -128,10 +135,10 @@ is a strongly typed language.
 
 \section{Lambda functions}
 
-Given \code{NumericVector} implements the range concept, a more C++ idiomatic
+Given that \code{NumericVector} implements the range concept, a more idiomatic
 way of approaching the problem is to use an algorithm from the Standard
-Template Library. The \code{count\_if} that was introduced
-in C++11 algorithm is a natural fit, \code{count\_if} iterates through a vector
+Template Library (STL). The \code{count\_if} algorithm that was introduced
+in C++11 is a natural fit: \code{count\_if} iterates through a vector
 and counts the number of times the specified predicate is true. Before C++11,
 we would express the predicate using a named function that is defined
 elsewhere:
@@ -170,8 +177,7 @@ int count_positive(NumericVector x){
 \end{example}
 
 With lambdas, C++11 offers a much nicer way to define the predicate, right at the
-call place. Lambdas make the STL much more useful as it eliminates
-many boiler plate code that was previously needed:
+call place, and removes the need for the boilerplate code in previous examples:
 
 \begin{example}
 // [[Rcpp::export]]
@@ -198,7 +204,7 @@ are no longer getting much faster. It is however becoming
 increasingly common that machines are equipped with multiple core processors, or
 even multiple processors. In order to make the most of these
 capabilities, software must take advantage of the available hardware
-concurrency, we cannot any longer sit back and wait for processors to be faster
+concurrency. We cannot any longer sit back and wait for processors to be faster
 and magically make our code faster.
 
 Concurrency is not a new thing, C++ programmers have been writing concurrent
@@ -376,8 +382,8 @@ serial    & \textbf{0.09} & 0.91  &  9.25 &  97.59 &    854.21 \\
 \end{tabular}
 \caption{\label{table:count}Run times (ms). Median run times between 10 runs.\\
 {\footnotesize Timings performed on a Mac Book Pro with a 2.3 GHz Intel Core i7 processor (4 cores), 16Go of RAM.
-Compiled with clang++ version 3.3 with the flags : \code{-g -O3}. R version 3.0.2
-as distributed by the CRAN binary for OSX. Best performance is typeset in bold for each data size. }}
+Compiled with \code{clang++} version 3.3 with the flags : \code{-g -O3}. R version 3.0.2
+as distributed by the CRAN binary for OS X. Best performance is typeset in bold for each data size. }}
 \end{table}
 
 \section{Other useful additions to the standard}
@@ -402,7 +408,7 @@ background compatibility. While this might be a good thing in general,
 these requirements put a lot of weight in the evolution scale of the
 underlying C++ library. Embracing C++11 has greatly simplified the internal
 implementation of \CRANpkg{Rcpp11}, and divorcing this implementation from
-\CRANpkg{Rcpp} allows us to undo previous errors in design that had crept into
+\CRANpkg{Rcpp} has allowed us to undo previous errors in design that had crept into
 \CRANpkg{Rcpp}.
 
 \subsection{Implementation Improvements}
@@ -448,7 +454,9 @@ Vector<RTYPE, StoragePolicy> Vector<RTYPE,StoragePolicy>::create(Args... args){
 
 This declaration defines create as a function taking a variable number of
 arguments (from zero to a compiler-defined maximum). No code bloat; functions
-are generated as required by the compiler when seen in user code.
+are generated as required by the compiler when seen in user code. The
+\code{create_type} function ensures that proper dispatch is done based on the
+type of R object seen.
 
 A substantial portion of the code base in \CRANpkg{Rcpp} was auto-generated to
 handle such situations, primarily in the modules framework -- roughly 59k lines (!)
